@@ -3,7 +3,6 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserEntity } from '../../user/entities/user.entity';
@@ -18,7 +17,7 @@ export class CustomersEntity {
   @JoinColumn()
   id_room: number;
 
-  @OneToOne(() => UserEntity, (user) => user.id)
+  @ManyToOne(() => UserEntity, (user) => user.id)
   @JoinColumn()
   id_user: number;
 
