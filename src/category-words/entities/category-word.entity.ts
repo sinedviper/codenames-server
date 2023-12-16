@@ -2,12 +2,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { WordsEntity } from '../../words/entities/words.entity';
-import { RoomEntity } from '../../room/entities/room.entity';
 
 @Entity()
 export class CategoryWordEntity {

@@ -3,14 +3,11 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
-  ManyToMany,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
-  JoinTable
 } from 'typeorm';
 import { RequestFriendEntity } from '../../request-friend/entities/request-friend.entity';
-import { PlayerEntity } from '../../players/entities/player.entity';
 import { TypeUserEntity } from '../../type-user/entities/type-user.entity';
 import { RoomEntity } from '../../room/entities/room.entity';
 import { FriendEntity } from '../../friend/entities/friend.entity';
@@ -27,13 +24,13 @@ export class UserEntity {
   @Column({ type: 'varchar', length: 255 })
   password: string;
 
-  @Column({ type: 'varchar', length: 255,nullable:true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   avatar?: number;
 
   @Column({ type: 'varchar', length: 7 })
   color: number;
 
-  @Column({ type: 'varchar', length: 10,nullable:true })
+  @Column({ type: 'varchar', length: 10, nullable: true })
   status?: string;
 
   @Column({ type: 'integer', default: 0 })
@@ -53,14 +50,17 @@ export class UserEntity {
   id_type: TypeUserEntity;
 
   @OneToMany(() => CustomersEntity, (customers) => customers.id_user)
-  customers:CustomersEntity[]
+  customers: CustomersEntity[];
 
   @OneToMany(() => FriendEntity, (friend) => friend.id_user)
-  friends:FriendEntity[]
+  friends: FriendEntity[];
 
   @OneToMany(() => RoomEntity, (room) => room.id_creator)
-  rooms:RoomEntity[]
+  rooms: RoomEntity[];
 
-  @OneToMany(() => RequestFriendEntity, (request_friend) => request_friend.id_user)
-  friendRequests:RequestFriendEntity[]
+  @OneToMany(
+    () => RequestFriendEntity,
+    (request_friend) => request_friend.id_user,
+  )
+  friendRequests: RequestFriendEntity[];
 }

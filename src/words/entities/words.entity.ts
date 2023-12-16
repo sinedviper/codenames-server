@@ -1,6 +1,12 @@
-import { Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { CategoryWordEntity } from '../../category-words/entities/category-word.entity';
-import {LanguageEntity} from "../../languages/entities/language.entity";
+import { LanguageEntity } from '../../languages/entities/language.entity';
 
 @Entity()
 export class WordsEntity {
@@ -14,4 +20,7 @@ export class WordsEntity {
   @OneToOne(() => CategoryWordEntity, (category_entity) => category_entity.id)
   @JoinColumn()
   id_category_word: CategoryWordEntity;
+
+  @Column({ type: 'varchar', length: 30, nullable: false })
+  word: string;
 }

@@ -29,8 +29,8 @@ export class TeamEntity {
   createdAt: Date;
 
   @OneToMany(() => RoomWordsEntity, (room_words) => room_words.id_team)
-  roomWords:RoomWordsEntity[]
+  roomWords: RoomWordsEntity[];
 
   @OneToMany(() => PlayerEntity, (players) => players.id_team)
-  players:PlayerEntity[]
+  players: PlayerEntity[];
 }

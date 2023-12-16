@@ -12,7 +12,6 @@ import { UserEntity } from '../../user/entities/user.entity';
 import { RoomStatusEntity } from '../../room-status/entities/room-status.entity';
 import { CategoryWordEntity } from '../../category-words/entities/category-word.entity';
 import { LanguageEntity } from '../../languages/entities/language.entity';
-import { PlayerEntity } from '../../players/entities/player.entity';
 import { TeamEntity } from '../../team/entities/team.entity';
 import { RoomWordsEntity } from '../../room-words/entities/room-words.entity';
 import { CountWordEntity } from '../../count-words/entities/count-word.entity';
@@ -34,7 +33,9 @@ export class RoomEntity {
   @JoinColumn()
   id_count_words: CountWordEntity;
 
-  @OneToOne(() => CategoryWordEntity, (category_words) => category_words.id, {nullable: true,})
+  @OneToOne(() => CategoryWordEntity, (category_words) => category_words.id, {
+    nullable: true,
+  })
   @JoinColumn()
   id_category_words?: CategoryWordEntity;
 
@@ -71,8 +72,8 @@ export class RoomEntity {
   createdAt: Date;
 
   @OneToMany(() => RoomWordsEntity, (room_word) => room_word.id_room)
-  roomWords:RoomWordsEntity[]
+  roomWords: RoomWordsEntity[];
 
   @OneToMany(() => TeamEntity, (team) => team.id_room)
-  teams:TeamEntity[]
+  teams: TeamEntity[];
 }
