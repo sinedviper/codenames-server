@@ -17,7 +17,7 @@ export class CustomersEntity {
   @JoinColumn()
   id_room: RoomEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.id)
+  @ManyToOne(() => UserEntity, (user) => user.customers)
   @JoinColumn()
   id_user: UserEntity;
 

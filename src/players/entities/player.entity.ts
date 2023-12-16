@@ -16,7 +16,7 @@ export class PlayerEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => TeamEntity, (team) => team.id)
+  @ManyToOne(() => TeamEntity, (team) => team.players)
   @JoinColumn()
   id_team: TeamEntity;
 

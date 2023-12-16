@@ -12,7 +12,7 @@ export class FriendEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => UserEntity, (user) => user.id)
+  @ManyToOne(() => UserEntity, (user) => user.friends)
   @JoinColumn()
   id_user: UserEntity;
 

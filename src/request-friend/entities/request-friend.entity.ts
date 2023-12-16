@@ -13,7 +13,7 @@ export class RequestFriendEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => UserEntity, (user) => user.id)
+  @ManyToOne(() => UserEntity, (user) => user.friendRequests)
   @JoinColumn()
   id_user: UserEntity;
 

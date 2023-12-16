@@ -21,11 +21,11 @@ export class RoomWordsEntity {
   @JoinColumn()
   id_words: WordsEntity;
 
-  @ManyToOne(() => TeamEntity, (team) => team.id)
+  @ManyToOne(() => TeamEntity, (team) => team.roomWords)
   @JoinColumn()
   id_team: TeamEntity;
 
-  @ManyToOne(() => RoomEntity, (room) => room.id)
+  @ManyToOne(() => RoomEntity, (room) => room.roomWords)
   @JoinColumn()
   id_room: RoomEntity;
 

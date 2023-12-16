@@ -22,7 +22,7 @@ export class RoomEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => UserEntity, (user) => user.id)
+  @ManyToOne(() => UserEntity, (user) => user.rooms)
   @JoinColumn()
   id_creator: UserEntity;
 

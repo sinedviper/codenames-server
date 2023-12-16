@@ -21,7 +21,7 @@ export class TeamEntity {
   @JoinColumn()
   id_color_team: ColorTeamEntity;
 
-  @ManyToOne(() => RoomEntity, (room) => room.id)
+  @ManyToOne(() => RoomEntity, (room) => room.teams)
   @JoinColumn()
   id_room: RoomEntity;
 
