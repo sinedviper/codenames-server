@@ -15,11 +15,11 @@ export class RequestFriendEntity {
 
   @ManyToOne(() => UserEntity, (user) => user.id)
   @JoinColumn()
-  id_user: number;
+  id_user: UserEntity;
 
-  @ManyToMany(() => UserEntity, (user) => user.id)
+  @ManyToOne(() => UserEntity, (user) => user.id)
   @JoinColumn()
-  id_request: number;
+  id_request_user: UserEntity;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

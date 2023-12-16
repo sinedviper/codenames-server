@@ -13,13 +13,13 @@ export class CustomersEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => RoomEntity, (room) => room.id) // Устанавливаем отношение OneToOne между Key и Lock
+  @ManyToOne(() => RoomEntity, (room) => room.id)
   @JoinColumn()
-  id_room: number;
+  id_room: RoomEntity;
 
   @ManyToOne(() => UserEntity, (user) => user.id)
   @JoinColumn()
-  id_user: number;
+  id_user: UserEntity;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

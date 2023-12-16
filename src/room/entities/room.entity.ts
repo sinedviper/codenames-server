@@ -19,38 +19,32 @@ import { CountWordEntity } from '../../count-words/entities/count-word.entity';
 
 @Entity()
 export class RoomEntity {
-  @OneToMany(() => RoomWordsEntity, (room_word) => room_word.id_room)
-  @OneToMany(() => TeamEntity, (team) => team.id_room)
-  @OneToMany(() => PlayerEntity, (players) => players.id_room)
   @PrimaryGeneratedColumn()
-  @JoinColumn()
   id: number;
 
   @ManyToOne(() => UserEntity, (user) => user.id)
   @JoinColumn()
-  id_creator: number;
+  id_creator: UserEntity;
 
   @OneToOne(() => RoomStatusEntity, (room_status) => room_status.id)
   @JoinColumn()
-  id_status: number;
+  id_status: RoomStatusEntity;
 
   @OneToOne(() => CountWordEntity, (count_words) => count_words.id)
   @JoinColumn()
-  id_count_words: number;
+  id_count_words: CountWordEntity;
 
-  @OneToOne(() => CategoryWordEntity, (category_words) => category_words.id, {
-    nullable: true,
-  })
+  @OneToOne(() => CategoryWordEntity, (category_words) => category_words.id, {nullable: true,})
   @JoinColumn()
-  id_category_words?: number;
+  id_category_words?: CategoryWordEntity;
 
   @OneToOne(() => LanguageEntity, (languages) => languages.id)
   @JoinColumn()
-  id_language_words: number;
+  id_language_words: LanguageEntity;
 
   @OneToOne(() => LanguageEntity, (languages) => languages.id)
   @JoinColumn()
-  id_translation_words: number;
+  id_translation_words: LanguageEntity;
 
   @Column({ type: 'integer' })
   time_for_break: number;
@@ -75,4 +69,10 @@ export class RoomEntity {
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
+
+  @OneToMany(() => RoomWordsEntity, (room_word) => room_word.id_room)
+  roomWords:RoomWordsEntity[]
+
+  @OneToMany(() => TeamEntity, (team) => team.id_room)
+  teams:TeamEntity[]
 }

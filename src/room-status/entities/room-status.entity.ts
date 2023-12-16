@@ -10,9 +10,7 @@ import { RoomEntity } from '../../room/entities/room.entity';
 
 @Entity()
 export class RoomStatusEntity {
-  @OneToOne(() => RoomEntity, (room) => room.id_status)
   @PrimaryGeneratedColumn()
-  @JoinColumn()
   id: number;
 
   @Column({ type: 'varchar', length: 10 })

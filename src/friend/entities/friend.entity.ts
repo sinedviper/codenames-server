@@ -14,9 +14,9 @@ export class FriendEntity {
 
   @ManyToOne(() => UserEntity, (user) => user.id)
   @JoinColumn()
-  id_user: number;
+  id_user: UserEntity;
 
-  @ManyToMany(() => UserEntity, (user) => user.id)
+  @ManyToOne(() => UserEntity, (user) => user.id)
   @JoinColumn()
-  id_friend: number;
+  id_friend: UserEntity;
 }

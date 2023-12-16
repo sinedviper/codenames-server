@@ -19,19 +19,19 @@ export class RoomWordsEntity {
 
   @OneToOne(() => WordsEntity, (word) => word.id)
   @JoinColumn()
-  id_words: number;
+  id_words: WordsEntity;
 
   @ManyToOne(() => TeamEntity, (team) => team.id)
   @JoinColumn()
-  id_team: number;
+  id_team: TeamEntity;
 
   @ManyToOne(() => RoomEntity, (room) => room.id)
   @JoinColumn()
-  id_room: number;
+  id_room: RoomEntity;
 
   @OneToOne(() => TypeWordsEntity, (type_word) => type_word.id)
   @JoinColumn()
-  id_type_words: number;
+  id_type_words: TypeWordsEntity;
 
   @Column({ type: 'boolean' })
   guess_word: boolean;

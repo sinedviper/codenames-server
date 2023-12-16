@@ -2,7 +2,7 @@ import {
   IsAlphanumeric,
   IsInt,
   IsNotEmpty,
-  IsString,
+  IsString, IsStrongPassword,
   Matches,
   MinLength,
 } from 'class-validator';
@@ -32,18 +32,13 @@ export class CreateUserDto {
   status: number;
 
   @IsNotEmpty()
-  @Matches(passwordRegEx, {
+  @IsStrongPassword()
+  /*@Matches(passwordRegEx, {
     message: `Password must contain Minimum 8 and maximum 20 characters, 
     at least one uppercase letter, 
     one lowercase letter, 
     one number and 
     one special character`,
-  })
+  })*/
   password: string;
-
-  @IsInt()
-  wins: number;
-
-  @IsInt()
-  lose: number;
 }

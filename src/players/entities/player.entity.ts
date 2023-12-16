@@ -18,17 +18,17 @@ export class PlayerEntity {
 
   @ManyToOne(() => TeamEntity, (team) => team.id)
   @JoinColumn()
-  id_team: number;
+  id_team: TeamEntity;
 
   @ManyToMany(() => UserEntity, (user) => user.id)
   @JoinColumn()
-  id_user: number;
+  id_user: UserEntity;
 
   @ManyToOne(() => RoomEntity, (room) => room.id)
   @JoinColumn()
-  id_room: number;
+  id_room: RoomEntity;
 
   @OneToOne(() => TypeUserEntity, (type_user) => type_user.id)
   @JoinColumn()
-  id_type_user: number;
+  id_type_user: TypeUserEntity;
 }

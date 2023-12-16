@@ -14,20 +14,23 @@ import { RoomWordsEntity } from '../../room-words/entities/room-words.entity';
 
 @Entity()
 export class TeamEntity {
-  @OneToMany(() => RoomWordsEntity, (room_words) => room_words.id_team)
-  @OneToMany(() => PlayerEntity, (players) => players.id_team)
   @PrimaryGeneratedColumn()
-  @JoinColumn()
   id: number;
 
   @OneToOne(() => ColorTeamEntity, (color_team) => color_team.id)
   @JoinColumn()
-  id_color_team: number;
+  id_color_team: ColorTeamEntity;
 
   @ManyToOne(() => RoomEntity, (room) => room.id)
   @JoinColumn()
-  id_room: number;
+  id_room: RoomEntity;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
+
+  @OneToMany(() => RoomWordsEntity, (room_words) => room_words.id_team)
+  roomWords:RoomWordsEntity[]
+
+  @OneToMany(() => PlayerEntity, (players) => players.id_team)
+  players:PlayerEntity[]
 }
