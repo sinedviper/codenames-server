@@ -24,17 +24,17 @@ export class UserEntity {
   @Column({ type: 'varchar', length: 30 })
   username: string;
 
-  @Column({ type: 'varchar', length: 30 })
+  @Column({ type: 'varchar', length: 255 })
   password: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  avatar: number;
+  @Column({ type: 'varchar', length: 255,nullable:true })
+  avatar?: number;
 
   @Column({ type: 'varchar', length: 7 })
   color: number;
 
-  @Column({ type: 'varchar', length: 10 })
-  status: number;
+  @Column({ type: 'varchar', length: 10,nullable:true })
+  status?: string;
 
   @Column({ type: 'integer', default: 0 })
   scores: number;
