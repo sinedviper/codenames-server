@@ -1,10 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
-
-import { CreateUserDto } from '../auth/dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UserEntity } from './entities/user.entity';
-import { InjectRepository } from '@nestjs/typeorm';
+import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
+import {Repository} from 'typeorm';
+import {UpdateUserDto} from './dto/update-user.dto';
+import {UserEntity} from './entities/user.entity';
+import {InjectRepository} from '@nestjs/typeorm';
+import {hash} from "bcrypt"
 
 @Injectable()
 export class UserService {
@@ -13,23 +12,36 @@ export class UserService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
-  }
+  async findAll() : Promise<Omit<UserEntity, "password">[]> {
+    const users = await this.userRepository.find();
 
-  findAll() {
-    return `This action returns all user`;
+    return users.map(({password, ...userWithoutPassword}) => userWithoutPassword);
   }
 
   findOne(id: number) {
     return `This action returns a #${id} user`;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, dto: UpdateUserDto) : Promise<UserEntity> {
+    const findUser = await this.userRepository.findOne({where:{id}})
+
+    if(!findUser)
+      throw new HttpException("User not found!",HttpStatus.BAD_REQUEST)
+
+    if(dto.password)
+      findUser.password = await hash(dto.password,10)
+
+    this.userRepository.merge(findUser,dto)
+
+    return  await this.userRepository.save(findUser)
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    const findUser = await this.userRepository.findOne({where:{id}})
+
+    if(!findUser)
+      throw new HttpException("User not found!",HttpStatus.BAD_REQUEST)
+
+    await this.userRepository.remove(findUser);
   }
 }
