@@ -28,7 +28,7 @@ export class UserEntity {
   avatar?: string;
 
   @Column({ type: 'varchar', length: 7 })
-  color: number;
+  color: string;
 
   @Column({ type: 'varchar', length: 10, nullable: true })
   status?: string;
