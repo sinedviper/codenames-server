@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 
 import { RoomStatusService } from './room-status.service';
 import { CreateRoomStatusDto } from './dto/create-room-status.dto';
@@ -18,7 +26,17 @@ export class RoomStatusController {
   }
 
   @Post()
-  createRoomStatus(@Body() createRoomStatusDto: CreateRoomStatusDto) {
-    return this.roomStatusService.createRoomStatus(createRoomStatusDto);
+  createRoomStatus(@Body() body: { typeStatus?: string }) {
+    return this.roomStatusService.createRoomStatus(body?.typeStatus);
+  }
+
+  @Delete()
+  deleteRoomStatus(@Body() body: { id?: number }) {
+    return this.roomStatusService.deleteRoomStatus(body?.id);
+  }
+
+  @Patch()
+  updateRoomStatus(@Body() body: { id?: number; typeStatus?: string }) {
+    return this.roomStatusService.updateRoomStatus(body);
   }
 }
