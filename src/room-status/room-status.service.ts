@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { RoomStatusEntity } from './entities/room-status.entity';
-import { CreateRoomStatusDto } from './dto/create-room-status.dto';
 
 @Injectable()
 export class RoomStatusService {
@@ -17,6 +16,9 @@ export class RoomStatusService {
   }
 
   async findOneRoomStatus(id: number): Promise<RoomStatusEntity> {
+    if (!id) {
+      throw new HttpException("Room id isn't in body", HttpStatus.BAD_REQUEST);
+    }
     const roomStatus = await this.roomStatus.findOne({ where: { id } });
     if (!roomStatus) {
       throw new HttpException("Room status isn't found", HttpStatus.NOT_FOUND);
@@ -24,14 +26,52 @@ export class RoomStatusService {
     return roomStatus;
   }
 
-  async createRoomStatus(
-    createRoomStatusDto: CreateRoomStatusDto,
-  ): Promise<RoomStatusEntity> {
+  async createRoomStatus(typeStatus: string): Promise<RoomStatusEntity> {
     const newRoomStatus = new RoomStatusEntity();
-    if (!createRoomStatusDto.typeStatus) {
+    if (!typeStatus) {
       throw new HttpException("Body isn't valid", HttpStatus.NOT_ACCEPTABLE);
     }
-    newRoomStatus.typeStatus = createRoomStatusDto.typeStatus;
+    newRoomStatus.typeStatus = typeStatus;
     return this.roomStatus.save(newRoomStatus);
+  }
+
+  async deleteRoomStatus(id: number): Promise<{ statusCode: number }> {
+    if (!id) {
+      throw new HttpException("Room id isn't in body", HttpStatus.BAD_REQUEST);
+    }
+    const roomStatus = await this.roomStatus.findOne({ where: { id } });
+    if (!roomStatus) {
+      throw new HttpException("Room status isn't found", HttpStatus.NOT_FOUND);
+    }
+    try {
+      await this.roomStatus.delete(id);
+
+      return { statusCode: HttpStatus.OK };
+    } catch (e) {
+      throw new HttpException(e?.message, HttpStatus.CONFLICT);
+    }
+  }
+
+  async updateRoomStatus(roomStatus: {
+    id?: number;
+    typeStatus?: string;
+  }): Promise<RoomStatusEntity> {
+    if (!roomStatus?.id || !roomStatus?.typeStatus) {
+      throw new HttpException(
+        "Room all params aren't in body",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const roomStatusFind = await this.roomStatus.findOne({
+      where: { id: roomStatus?.id },
+    });
+
+    if (!roomStatusFind) {
+      throw new HttpException("Room status isn't found", HttpStatus.NOT_FOUND);
+    }
+    roomStatusFind.typeStatus = roomStatus.typeStatus;
+
+    return this.roomStatus.save(roomStatusFind);
   }
 }
