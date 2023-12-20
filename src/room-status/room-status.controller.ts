@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 
 import { RoomStatusService } from './room-status.service';
-import { CreateRoomStatusDto } from './dto/create-room-status.dto';
 
 @Controller('room-status')
 export class RoomStatusController {
