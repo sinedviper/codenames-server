@@ -28,7 +28,7 @@ export class RoomStatusController {
 
   @Post()
   createRoomStatus(@Body() body: CreateRoomStatusDto) {
-    return this.roomStatusService.create(body?.typeStatus);
+    return this.roomStatusService.create(body);
   }
 
   @Delete()
