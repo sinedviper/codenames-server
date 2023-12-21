@@ -11,7 +11,7 @@ export class CreateRoomStatusDto {
   id: number;
 
   @Column({ type: 'varchar', length: 10 })
-  typeStatus: string;
+  typeStatus?: string;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
