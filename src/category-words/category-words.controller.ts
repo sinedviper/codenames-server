@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { CategoryWordsService } from './category-words.service';
 import { CreateCategoryWordDto } from './dto/create-category-word.dto';
 import { UpdateCategoryWordDto } from './dto/update-category-word.dto';
@@ -8,27 +16,27 @@ export class CategoryWordsController {
   constructor(private readonly categoryWordsService: CategoryWordsService) {}
 
   @Post()
-  create(@Body() createCategoryWordDto: CreateCategoryWordDto) {
+  createCategoryWords(@Body() createCategoryWordDto: CreateCategoryWordDto) {
     return this.categoryWordsService.create(createCategoryWordDto);
   }
 
   @Get()
-  findAll() {
+  findAllCategoryWords() {
     return this.categoryWordsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOneCategoryWords(@Param('id') id: string) {
     return this.categoryWordsService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoryWordDto: UpdateCategoryWordDto) {
-    return this.categoryWordsService.update(+id, updateCategoryWordDto);
+  @Patch()
+  updateCategoryWords(@Body() updateCategoryWordDto: UpdateCategoryWordDto) {
+    return this.categoryWordsService.update(updateCategoryWordDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.categoryWordsService.remove(+id);
+  @Delete()
+  removeCategoryWords(@Body() body: { id?: string }) {
+    return this.categoryWordsService.remove(+body?.id);
   }
 }
