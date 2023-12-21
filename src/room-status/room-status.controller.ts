@@ -10,6 +10,7 @@ import {
 
 import { RoomStatusService } from './room-status.service';
 import { CreateRoomStatusDto } from './dto/create-room-status.dto';
+import { UpdateRoomStatusDto } from './dto/update-room-status.dto';
 
 @Controller('room-status')
 export class RoomStatusController {
@@ -17,26 +18,26 @@ export class RoomStatusController {
 
   @Get()
   getAllRoomStatus() {
-    return this.roomStatusService.findAllRoomStatus();
+    return this.roomStatusService.findAll();
   }
 
   @Get(':id')
   getRoomStatus(@Param('id') id: number) {
-    return this.roomStatusService.findOneRoomStatus(id);
+    return this.roomStatusService.findOne(id);
   }
 
   @Post()
-  createRoomStatus(@Body() body: { typeStatus?: string }) {
-    return this.roomStatusService.createRoomStatus(body?.typeStatus);
+  createRoomStatus(@Body() body: CreateRoomStatusDto) {
+    return this.roomStatusService.create(body);
   }
 
   @Delete()
-  deleteRoomStatus(@Body() body: { id?: number }) {
-    return this.roomStatusService.deleteRoomStatus(body?.id);
+  deleteRoomStatus(@Body('id') id?: number) {
+    return this.roomStatusService.delete(+id);
   }
 
   @Patch()
-  updateRoomStatus(@Body() body: { id?: number; typeStatus?: string }) {
-    return this.roomStatusService.updateRoomStatus(body);
+  updateRoomStatus(@Body() body: UpdateRoomStatusDto) {
+    return this.roomStatusService.update(body);
   }
 }
