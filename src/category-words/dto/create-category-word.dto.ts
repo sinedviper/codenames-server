@@ -11,7 +11,7 @@ export class CreateCategoryWordDto {
   id: number;
 
   @Column({ type: 'varchar', length: 30 })
-  category: string;
+  category?: string;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

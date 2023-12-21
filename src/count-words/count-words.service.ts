@@ -23,10 +23,17 @@ export class CountWordsService {
 
     newCountWord.count = createCountWordDto.count;
 
-    return {
-      statusCode: HttpStatus.CREATED,
-      data: await this.countWords.save(newCountWord),
-    };
+    try {
+      return {
+        statusCode: HttpStatus.CREATED,
+        data: await this.countWords.save(newCountWord),
+      };
+    } catch (e) {
+      throw new HttpException(
+        'Something was wrong',
+        HttpStatus.EXPECTATION_FAILED,
+      );
+    }
   }
 
   async findAll(): Promise<typeHttpResponse<CountWordEntity[]>> {
@@ -46,18 +53,22 @@ export class CountWordsService {
   async findOne(id: number): Promise<typeHttpResponse<CountWordEntity>> {
     if (!id) {
       throw new HttpException(
-        "Category word id isn't in body",
+        "Count word id isn't in body",
         HttpStatus.BAD_REQUEST,
       );
     }
-    const countWord = await this.countWords.findOne({ where: { id } });
-    if (!countWord) {
+    try {
+      const countWord = await this.countWords.findOne({ where: { id } });
+      if (!countWord) {
+        throw new HttpException("Count word isn't found", HttpStatus.NOT_FOUND);
+      }
+      return { statusCode: HttpStatus.OK, data: countWord };
+    } catch (e) {
       throw new HttpException(
-        "Category word isn't found",
-        HttpStatus.NOT_FOUND,
+        'Something was wrong',
+        HttpStatus.EXPECTATION_FAILED,
       );
     }
-    return { statusCode: HttpStatus.OK, data: countWord };
   }
 
   async update(
@@ -65,36 +76,43 @@ export class CountWordsService {
   ): Promise<typeHttpResponse<CountWordEntity>> {
     if (!updateCountWordDto?.id || !updateCountWordDto?.count) {
       throw new HttpException(
-        "Count words params aren't in body",
+        "Count word params aren't in body",
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    const categoryWordFind = await this.countWords.findOne({
+    const countWordFind = await this.countWords.findOne({
       where: { id: updateCountWordDto?.id },
     });
 
-    if (!categoryWordFind) {
-      throw new HttpException("Count words isn't found", HttpStatus.NOT_FOUND);
+    if (!countWordFind) {
+      throw new HttpException("Count word isn't found", HttpStatus.NOT_FOUND);
     }
-    categoryWordFind.count = updateCountWordDto.count;
+    countWordFind.count = updateCountWordDto.count;
 
-    return {
-      statusCode: HttpStatus.OK,
-      data: await this.countWords.save(categoryWordFind),
-    };
+    try {
+      return {
+        statusCode: HttpStatus.OK,
+        data: await this.countWords.save(countWordFind),
+      };
+    } catch (e) {
+      throw new HttpException(
+        'Something was wrong',
+        HttpStatus.EXPECTATION_FAILED,
+      );
+    }
   }
 
   async remove(id: number): Promise<typeHttpResponse<null>> {
     if (!id) {
       throw new HttpException(
-        "Count words id isn't in body",
+        "Count word id isn't in body",
         HttpStatus.BAD_REQUEST,
       );
     }
-    const categoryWords = await this.countWords.findOne({ where: { id } });
-    if (!categoryWords) {
-      throw new HttpException("Count words isn't found", HttpStatus.NOT_FOUND);
+    const countWord = await this.countWords.findOne({ where: { id } });
+    if (!countWord) {
+      throw new HttpException("Count word isn't found", HttpStatus.NOT_FOUND);
     }
     try {
       await this.countWords.delete(id);

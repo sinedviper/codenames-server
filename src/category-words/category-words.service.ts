@@ -24,10 +24,17 @@ export class CategoryWordsService {
 
     newCategoryWords.category = createCategoryWordDto.category;
 
-    return {
-      statusCode: HttpStatus.CREATED,
-      data: await this.categoryWords.save(newCategoryWords),
-    };
+    try {
+      return {
+        statusCode: HttpStatus.CREATED,
+        data: await this.categoryWords.save(newCategoryWords),
+      };
+    } catch (e) {
+      throw new HttpException(
+        'Something was wrong',
+        HttpStatus.EXPECTATION_FAILED,
+      );
+    }
   }
 
   async findAll(): Promise<typeHttpResponse<CategoryWordEntity[]>> {
@@ -51,14 +58,22 @@ export class CategoryWordsService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const categoryWords = await this.categoryWords.findOne({ where: { id } });
-    if (!categoryWords) {
+
+    try {
+      const categoryWords = await this.categoryWords.findOne({ where: { id } });
+      if (!categoryWords) {
+        throw new HttpException(
+          "Category word isn't found",
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      return { statusCode: HttpStatus.OK, data: categoryWords };
+    } catch (e) {
       throw new HttpException(
-        "Category word isn't found",
-        HttpStatus.NOT_FOUND,
+        'Something was wrong',
+        HttpStatus.EXPECTATION_FAILED,
       );
     }
-    return { statusCode: HttpStatus.OK, data: categoryWords };
   }
 
   async update(
@@ -66,7 +81,7 @@ export class CategoryWordsService {
   ): Promise<typeHttpResponse<CategoryWordEntity>> {
     if (!updateCategoryWordDto?.id || !updateCategoryWordDto?.category) {
       throw new HttpException(
-        "Category words params aren't in body",
+        "Category word params aren't in body",
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -77,29 +92,36 @@ export class CategoryWordsService {
 
     if (!categoryWordFind) {
       throw new HttpException(
-        "Category words isn't found",
+        "Category word isn't found",
         HttpStatus.NOT_FOUND,
       );
     }
     categoryWordFind.category = updateCategoryWordDto.category;
 
-    return {
-      statusCode: HttpStatus.OK,
-      data: await this.categoryWords.save(categoryWordFind),
-    };
+    try {
+      return {
+        statusCode: HttpStatus.OK,
+        data: await this.categoryWords.save(categoryWordFind),
+      };
+    } catch (e) {
+      throw new HttpException(
+        'Something was wrong',
+        HttpStatus.EXPECTATION_FAILED,
+      );
+    }
   }
 
   async remove(id: number): Promise<typeHttpResponse<null>> {
     if (!id) {
       throw new HttpException(
-        "Category words id isn't in body",
+        "Category word id isn't in body",
         HttpStatus.BAD_REQUEST,
       );
     }
     const categoryWords = await this.categoryWords.findOne({ where: { id } });
     if (!categoryWords) {
       throw new HttpException(
-        "Category words isn't found",
+        "Category word isn't found",
         HttpStatus.NOT_FOUND,
       );
     }

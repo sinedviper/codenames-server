@@ -11,7 +11,7 @@ export class CreateCountWordDto {
   id: number;
 
   @Column({ type: 'integer' })
-  count: number;
+  count?: number;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

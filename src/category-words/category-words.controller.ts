@@ -26,7 +26,7 @@ export class CategoryWordsController {
   }
 
   @Get(':id')
-  findOneCategoryWords(@Param('id') id: string) {
+  findOneCategoryWords(@Param('id') id: number) {
     return this.categoryWordsService.findOne(+id);
   }
 
@@ -36,7 +36,7 @@ export class CategoryWordsController {
   }
 
   @Delete()
-  removeCategoryWords(@Body() body: { id?: string }) {
-    return this.categoryWordsService.remove(+body?.id);
+  removeCategoryWords(@Body('id') id?: number) {
+    return this.categoryWordsService.remove(+id);
   }
 }

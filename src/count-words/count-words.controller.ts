@@ -26,7 +26,7 @@ export class CountWordsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.countWordsService.findOne(+id);
   }
 
@@ -36,7 +36,7 @@ export class CountWordsController {
   }
 
   @Delete()
-  remove(@Body() body: { id?: string }) {
-    return this.countWordsService.remove(+body?.id);
+  remove(@Body('id') id?: number) {
+    return this.countWordsService.remove(+id);
   }
 }
