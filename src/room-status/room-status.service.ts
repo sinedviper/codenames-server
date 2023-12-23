@@ -29,21 +29,11 @@ export class RoomStatusService {
     if (!id) {
       throw new HttpException("Room id isn't in body", HttpStatus.BAD_REQUEST);
     }
-    try {
-      const roomStatus = await this.roomStatus.findOne({ where: { id } });
-      if (!roomStatus) {
-        throw new HttpException(
-          "Room status isn't found",
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      return { statusCode: HttpStatus.OK, data: roomStatus };
-    } catch (e) {
-      throw new HttpException(
-        'Something was wrong',
-        HttpStatus.EXPECTATION_FAILED,
-      );
+    const roomStatus = await this.roomStatus.findOne({ where: { id } });
+    if (!roomStatus) {
+      throw new HttpException("Room status isn't found", HttpStatus.NOT_FOUND);
     }
+    return { statusCode: HttpStatus.OK, data: roomStatus };
   }
 
   async create(

@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
+
 import { TypeUserService } from './type-user.service';
 import { CreateTypeUserDto } from './dto/create-type-user.dto';
 import { UpdateTypeUserDto } from './dto/update-type-user.dto';
@@ -18,17 +27,17 @@ export class TypeUserController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.typeUserService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTypeUserDto: UpdateTypeUserDto) {
-    return this.typeUserService.update(+id, updateTypeUserDto);
+  @Patch()
+  update(@Body() updateTypeUserDto: UpdateTypeUserDto) {
+    return this.typeUserService.update(updateTypeUserDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Delete()
+  remove(@Body('id') id: number) {
     return this.typeUserService.remove(+id);
   }
 }

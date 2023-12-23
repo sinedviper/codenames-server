@@ -57,18 +57,11 @@ export class CountWordsService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    try {
-      const countWord = await this.countWords.findOne({ where: { id } });
-      if (!countWord) {
-        throw new HttpException("Count word isn't found", HttpStatus.NOT_FOUND);
-      }
-      return { statusCode: HttpStatus.OK, data: countWord };
-    } catch (e) {
-      throw new HttpException(
-        'Something was wrong',
-        HttpStatus.EXPECTATION_FAILED,
-      );
+    const countWord = await this.countWords.findOne({ where: { id } });
+    if (!countWord) {
+      throw new HttpException("Count word isn't found", HttpStatus.NOT_FOUND);
     }
+    return { statusCode: HttpStatus.OK, data: countWord };
   }
 
   async update(

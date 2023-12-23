@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { TypeWordsService } from './type-words.service';
 import { CreateTypeWordDto } from './dto/create-type-word.dto';
 import { UpdateTypeWordDto } from './dto/update-type-word.dto';
@@ -18,17 +26,17 @@ export class TypeWordsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.typeWordsService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTypeWordDto: UpdateTypeWordDto) {
-    return this.typeWordsService.update(+id, updateTypeWordDto);
+  @Patch()
+  update(@Body() updateTypeWordDto: UpdateTypeWordDto) {
+    return this.typeWordsService.update(updateTypeWordDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Delete()
+  remove(@Body('id') id: number) {
     return this.typeWordsService.remove(+id);
   }
 }

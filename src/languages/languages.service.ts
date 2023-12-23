@@ -58,18 +58,11 @@ export class LanguagesService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    try {
-      const language = await this.languages.findOne({ where: { id } });
-      if (!language) {
-        throw new HttpException("Language isn't found", HttpStatus.NOT_FOUND);
-      }
-      return { statusCode: HttpStatus.OK, data: language };
-    } catch (e) {
-      throw new HttpException(
-        'Something was wrong',
-        HttpStatus.EXPECTATION_FAILED,
-      );
+    const language = await this.languages.findOne({ where: { id } });
+    if (!language) {
+      throw new HttpException("Language isn't found", HttpStatus.NOT_FOUND);
     }
+    return { statusCode: HttpStatus.OK, data: language };
   }
 
   async update(

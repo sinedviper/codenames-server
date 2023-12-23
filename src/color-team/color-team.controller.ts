@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ColorTeamService } from './color-team.service';
 import { CreateColorTeamDto } from './dto/create-color-team.dto';
 import { UpdateColorTeamDto } from './dto/update-color-team.dto';
@@ -18,17 +26,17 @@ export class ColorTeamController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.colorTeamService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateColorTeamDto: UpdateColorTeamDto) {
-    return this.colorTeamService.update(+id, updateColorTeamDto);
+  @Patch()
+  update(@Body() updateColorTeamDto: UpdateColorTeamDto) {
+    return this.colorTeamService.update(updateColorTeamDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Delete()
+  remove(@Body('id') id?: number) {
     return this.colorTeamService.remove(+id);
   }
 }

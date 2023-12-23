@@ -59,21 +59,14 @@ export class CategoryWordsService {
       );
     }
 
-    try {
-      const categoryWords = await this.categoryWords.findOne({ where: { id } });
-      if (!categoryWords) {
-        throw new HttpException(
-          "Category word isn't found",
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      return { statusCode: HttpStatus.OK, data: categoryWords };
-    } catch (e) {
+    const categoryWords = await this.categoryWords.findOne({ where: { id } });
+    if (!categoryWords) {
       throw new HttpException(
-        'Something was wrong',
-        HttpStatus.EXPECTATION_FAILED,
+        "Category word isn't found",
+        HttpStatus.NOT_FOUND,
       );
     }
+    return { statusCode: HttpStatus.OK, data: categoryWords };
   }
 
   async update(

@@ -16,8 +16,8 @@ export class RoomWordsService {
     return `This action returns a #${id} roomWord`;
   }
 
-  update(id: number, updateRoomWordDto: UpdateRoomWordDto) {
-    return `This action updates a #${id} roomWord`;
+  update(updateRoomWordDto: UpdateRoomWordDto) {
+    return `This action updates a roomWord`;
   }
 
   remove(id: number) {
