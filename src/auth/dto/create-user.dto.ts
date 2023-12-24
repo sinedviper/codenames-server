@@ -30,7 +30,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @MinLength(7, { message: 'Color must have atleast 7 characters.' })
-  color: number;
+  color: string;
 
   age?: number;
   avatar?: string;
