@@ -1,16 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  JoinColumn,
-  ManyToOne,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { UserEntity } from '../../user/entities/user.entity';
-import { RoomStatusEntity } from '../../room-status/entities/room-status.entity';
-import { CountWordEntity } from '../../count-words/entities/count-word.entity';
-import { CategoryWordEntity } from '../../category-words/entities/category-word.entity';
-import { LanguageEntity } from '../../languages/entities/language.entity';
+import { Column, CreateDateColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 export class CreateRoomDto {
   @PrimaryGeneratedColumn()

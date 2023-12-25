@@ -3,6 +3,8 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToMany,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -55,7 +57,7 @@ export class UserEntity {
   @OneToMany(() => FriendEntity, (friend) => friend.id_user)
   friends: FriendEntity[];
 
-  @OneToMany(() => RoomEntity, (room) => room.id_creator)
+  @ManyToOne(() => RoomEntity, (room) => room.id_creator)
   rooms: RoomEntity[];
 
   @OneToMany(

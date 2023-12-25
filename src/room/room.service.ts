@@ -1,8 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateRoomDto } from './dto/create-room.dto';
-import { UpdateRoomDto } from './dto/update-room.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
+import { CreateRoomDto } from './dto/create-room.dto';
+import { UpdateRoomDto } from './dto/update-room.dto';
 import { RoomEntity } from './entities/room.entity';
 import { TeamEntity } from '../team/entities/team.entity';
 import { ColorTeamEntity } from '../color-team/entities/color-team.entity';
@@ -11,6 +12,9 @@ import { CategoryWordEntity } from '../category-words/entities/category-word.ent
 import { LanguageEntity } from '../languages/entities/language.entity';
 import { CountWordEntity } from '../count-words/entities/count-word.entity';
 import { RoomStatusEntity } from '../room-status/entities/room-status.entity';
+import { RoomDto } from './dto/room.dto';
+import { TeamDto } from '../team/dto/team.dto';
+import { CreateTeamDto } from '../team/dto/create-team.dto';
 
 @Injectable()
 export class RoomService {
@@ -35,6 +39,7 @@ export class RoomService {
 
   async create(createRoomDto: CreateRoomDto) {
     const room = new RoomEntity();
+    const roomSend = new RoomDto();
 
     if (!createRoomDto.id_creator) {
       throw new HttpException(
@@ -47,6 +52,7 @@ export class RoomService {
       });
       if (user) {
         room.id_creator = createRoomDto.id_creator;
+        roomSend.creator = createRoomDto.id_creator;
       } else {
         throw new HttpException(
           'Creator has`t found in database',
@@ -63,6 +69,7 @@ export class RoomService {
       });
       if (categoryWord) {
         room.id_category_words = createRoomDto.id_category_words;
+        roomSend.category_words = categoryWord;
       } else {
         throw new HttpException(
           'Category word has`t found in database',
@@ -82,6 +89,7 @@ export class RoomService {
       });
       if (language) {
         room.id_language_words = createRoomDto.id_language_words;
+        roomSend.language_words = language;
       } else {
         throw new HttpException(
           'Language has`t found in database',
@@ -101,6 +109,7 @@ export class RoomService {
       });
       if (countWord) {
         room.id_count_words = createRoomDto.id_count_words;
+        roomSend.count_words = countWord;
       } else {
         throw new HttpException(
           'Count word has`t found in database',
@@ -123,10 +132,13 @@ export class RoomService {
           where: { id: createRoomDto.id_translation_words },
         });
         if (language) {
+          room.translation_card = createRoomDto.translation_card;
           room.id_translation_words = createRoomDto.id_translation_words;
+          roomSend.translation_card = createRoomDto.translation_card;
+          roomSend.translation_words = language;
         } else {
           throw new HttpException(
-            'Count word has`t found in database',
+            'Translation has`t found in database',
             HttpStatus.NOT_FOUND,
           );
         }
@@ -134,6 +146,8 @@ export class RoomService {
     } else {
       room.translation_card = false;
       room.id_translation_words = undefined;
+      roomSend.translation_card = false;
+      roomSend.translation_words = undefined;
     }
 
     const roomStatus = await this.roomStatus.findOne({
@@ -141,9 +155,10 @@ export class RoomService {
     });
     if (roomStatus) {
       createRoomDto.id_status = roomStatus.id;
+      roomSend.status = roomStatus;
     } else {
       throw new HttpException(
-        'Something was wrong',
+        'Can`t find a start',
         HttpStatus.EXPECTATION_FAILED,
       );
     }
@@ -152,9 +167,11 @@ export class RoomService {
       typeof createRoomDto.close_room === 'boolean' &&
       createRoomDto.close_room
     ) {
-      room.close_room = createRoomDto.close_room;
       if (createRoomDto.password) {
+        room.close_room = createRoomDto.close_room;
         room.password = createRoomDto.password;
+        roomSend.close_room = createRoomDto.close_room;
+        roomSend.password = createRoomDto.password;
       } else {
         throw new HttpException(
           'Body has`t password when close room is true',
@@ -164,34 +181,50 @@ export class RoomService {
     } else {
       room.close_room = false;
       room.password = undefined;
+      roomSend.close_room = false;
+      roomSend.password = undefined;
     }
 
     if (typeof createRoomDto.time_for_start === 'number') {
       room.time_for_start = createRoomDto.time_for_start;
+      roomSend.time_for_start = createRoomDto.time_for_start;
     } else {
       room.time_for_start = 120;
+      roomSend.time_for_start = 120;
     }
 
     if (typeof createRoomDto.time_for_round === 'number') {
       room.time_for_round = createRoomDto.time_for_round;
+      roomSend.time_for_round = createRoomDto.time_for_round;
     } else {
       room.time_for_round = 60;
+      roomSend.time_for_round = 60;
     }
 
     if (typeof createRoomDto.time_for_break === 'number') {
       room.time_for_break = createRoomDto.time_for_break;
+      roomSend.time_for_break = createRoomDto.time_for_break;
     } else {
       room.time_for_break = 30;
+      roomSend.time_for_break = 30;
     }
 
     if (typeof createRoomDto.time_for_guess === 'number') {
       room.time_for_guess = createRoomDto.time_for_guess;
+      roomSend.time_for_guess = createRoomDto.time_for_guess;
     } else {
       room.time_for_guess = 15;
+      roomSend.time_for_guess = 15;
     }
 
     try {
-      const newRoom = await this.room.save(room);
+      const newRoom = await this.room.save(room).catch(() => {
+        throw new HttpException(
+          'Can`t save room',
+          HttpStatus.EXPECTATION_FAILED,
+        );
+      });
+      roomSend.id = newRoom.id;
 
       const teams = [];
 
@@ -199,14 +232,22 @@ export class RoomService {
         where: { color: 'red' },
       });
       if (colorTeamRed) {
-        const team = new TeamEntity();
+        const team = new CreateTeamDto();
+        const teamSend = new TeamDto();
         team.id_room = newRoom.id;
+        teamSend.id_room = newRoom.id;
         team.id_color_team = colorTeamRed.id;
-        const newTeam = await this.team.save(team);
-        teams.push(newTeam);
+        teamSend.color_team = colorTeamRed;
+        await this.team.save(team).catch(() => {
+          throw new HttpException(
+            'Can`t save color for team',
+            HttpStatus.EXPECTATION_FAILED,
+          );
+        });
+        teams.push(teamSend);
       } else {
         throw new HttpException(
-          'Something was wrong',
+          'Can`t find color for team red',
           HttpStatus.EXPECTATION_FAILED,
         );
       }
@@ -215,21 +256,29 @@ export class RoomService {
         where: { color: 'blue' },
       });
       if (colorTeamBlue) {
-        const team = new TeamEntity();
+        const team = new CreateTeamDto();
+        const teamSend = new TeamDto();
         team.id_room = newRoom.id;
+        teamSend.id_room = newRoom.id;
         team.id_color_team = colorTeamBlue.id;
-        const newTeam = await this.team.save(team);
-        teams.push(newTeam);
+        teamSend.color_team = colorTeamBlue;
+        await this.team.save(team).catch(() => {
+          throw new HttpException(
+            'Can`t save color for team',
+            HttpStatus.EXPECTATION_FAILED,
+          );
+        });
+        teams.push(teamSend);
       } else {
         throw new HttpException(
-          'Something was wrong',
+          'Can`t find color for team blue',
           HttpStatus.EXPECTATION_FAILED,
         );
       }
 
       return {
         statusCode: HttpStatus.CREATED,
-        data: { room: newRoom, teams },
+        data: { room: roomSend, teams, words: [] },
       };
     } catch (e) {
       throw new HttpException(
@@ -239,8 +288,18 @@ export class RoomService {
     }
   }
 
-  findAll() {
-    return `This action returns all room`;
+  async findAll() {
+    try {
+      return {
+        statusCode: HttpStatus.OK,
+        data: await this.room.find(),
+      };
+    } catch (e) {
+      throw new HttpException(
+        'Something was wrong',
+        HttpStatus.EXPECTATION_FAILED,
+      );
+    }
   }
 
   async findOne(id: number) {
@@ -255,10 +314,23 @@ export class RoomService {
   }
 
   update(updateRoomDto: UpdateRoomDto) {
-    return `This action updates a ыroom`;
+    return `This action updates a room`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} room`;
+  async remove(id: number) {
+    if (!id) {
+      throw new HttpException("Room id isn't in body", HttpStatus.BAD_REQUEST);
+    }
+    const room = await this.room.findOne({ where: { id } });
+    if (!room) {
+      throw new HttpException("Room isn't found", HttpStatus.NOT_FOUND);
+    }
+    try {
+      await this.room.delete(id);
+
+      return { statusCode: HttpStatus.OK };
+    } catch (e) {
+      throw new HttpException(e?.message, HttpStatus.CONFLICT);
+    }
   }
 }
