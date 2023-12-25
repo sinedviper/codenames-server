@@ -19,11 +19,11 @@ export class TeamEntity {
 
   @OneToOne(() => ColorTeamEntity, (color_team) => color_team.id)
   @JoinColumn()
-  id_color_team: ColorTeamEntity;
+  id_color_team: number;
 
   @ManyToOne(() => RoomEntity, (room) => room.teams)
   @JoinColumn()
-  id_room: RoomEntity;
+  id_room: number;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

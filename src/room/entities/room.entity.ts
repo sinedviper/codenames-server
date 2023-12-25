@@ -23,29 +23,31 @@ export class RoomEntity {
 
   @ManyToOne(() => UserEntity, (user) => user.rooms)
   @JoinColumn()
-  id_creator: UserEntity;
+  id_creator: number;
 
   @OneToOne(() => RoomStatusEntity, (room_status) => room_status.id)
   @JoinColumn()
-  id_status: RoomStatusEntity;
+  id_status: number;
 
   @OneToOne(() => CountWordEntity, (count_words) => count_words.id)
   @JoinColumn()
-  id_count_words: CountWordEntity;
+  id_count_words: number;
 
   @OneToOne(() => CategoryWordEntity, (category_words) => category_words.id, {
     nullable: true,
   })
   @JoinColumn()
-  id_category_words?: CategoryWordEntity;
+  id_category_words?: number;
 
   @OneToOne(() => LanguageEntity, (languages) => languages.id)
   @JoinColumn()
-  id_language_words: LanguageEntity;
+  id_language_words: number;
 
-  @OneToOne(() => LanguageEntity, (languages) => languages.id)
+  @OneToOne(() => LanguageEntity, (languages) => languages.id, {
+    nullable: true,
+  })
   @JoinColumn()
-  id_translation_words: LanguageEntity;
+  id_translation_words?: number;
 
   @Column({ type: 'integer' })
   time_for_break: number;
@@ -62,7 +64,7 @@ export class RoomEntity {
   @Column({ type: 'boolean' })
   translation_card: boolean;
 
-  @Column({ type: 'varchar', length: 30, nullable: true })
+  @Column({ type: 'varchar', length: 6, nullable: true })
   password: string;
 
   @Column({ type: 'boolean' })
