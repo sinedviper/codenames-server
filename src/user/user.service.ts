@@ -108,24 +108,31 @@ export class UserService {
     if(!user)
       throw new HttpException(Errors.USER_NOT_FOUND,HttpStatus.NOT_FOUND)
 
+    if(file.size <= 0)
+      throw new HttpException("Img doesn't exists!",HttpStatus.BAD_REQUEST)
+
     if(user.avatar){
-      if (fs.existsSync(user.avatar)) {
-        fs.unlinkSync(user.avatar);
+      const fullPath = path.join(__dirname, '..', '..', user.avatar);
+      if (fs.existsSync(fullPath)) {
+        fs.unlinkSync(fullPath);
       }
     }
 
     const uniqueFileName = v4() + path.extname(file.originalname);
-    const filePath = path.join(this.uploadDir, uniqueFileName);
+    const filePath = `./image/${uniqueFileName}`;
 
-    await fs.promises.writeFile(this.uploadDir, file.buffer)
+    fs.writeFileSync(filePath, file.buffer);
 
-    user.avatar = path.relative(__dirname, filePath)
-
+    user.avatar = filePath
     await this.userRepository.save(user)
 
     return {
       statusCode:HttpStatus.OK,
       data:true
     }
+  }
+
+  async deleteAvatar(){
+
   }
 }
