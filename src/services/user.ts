@@ -19,12 +19,38 @@ async function checkExistsUsername(userRepository: Repository<UserEntity>, usern
     }
 }
 
+async function generateDataForToken(user:UserEntity){
+    try{
+        return{
+            id:user.id,
+            username:user.username
+        }
+    } catch (e) {
+       console.log(`${generateDataForToken.name}: `+e)
+    }
+}
+
+/*function buildUserResponseWithToken(user:UserEntity,token:string) : UserResponseInterface{
+    try{
+        return {
+            user:{
+                ...user,
+                token
+            }
+        }
+    } catch (e) {
+        console.log(`${buildUserResponse.name}: `+e)
+    }
+}*/
 function buildUserResponse(user:UserEntity) : UserResponseInterface{
     try{
-        return {user}
+        return {
+            user
+        }
     } catch (e) {
         console.log(`${buildUserResponse.name}: `+e)
     }
 }
 
-export {hashPassword,checkExistsUsername,buildUserResponse}
+
+export {hashPassword,checkExistsUsername,buildUserResponse,generateDataForToken}
