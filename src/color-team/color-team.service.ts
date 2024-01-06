@@ -25,9 +25,11 @@ export class ColorTeamService {
     colorTeam.color = createColorTeamDto.color;
 
     try {
+      const newColor = await this.colorTeam.save(colorTeam);
+
       return {
         statusCode: HttpStatus.CREATED,
-        data: await this.colorTeam.save(colorTeam),
+        data: newColor,
       };
     } catch (e) {
       throw new HttpException(

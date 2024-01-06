@@ -15,11 +15,11 @@ export class CreateWordDto {
 
   @OneToOne(() => LanguageEntity, (language) => language.id)
   @JoinColumn()
-  id_language: number;
+  id_language: LanguageEntity;
 
   @OneToOne(() => CategoryWordEntity, (category_entity) => category_entity.id)
   @JoinColumn()
-  id_category_word: number;
+  id_category_word: CategoryWordEntity;
 
   @Column({ type: 'varchar', length: 30, nullable: false })
   word: string;

@@ -1,54 +1,41 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToMany,
-  ManyToOne,
-  OneToMany,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, JoinColumn, ManyToOne } from 'typeorm';
 import { UserEntity } from '../../user/entities/user.entity';
 import { RoomStatusEntity } from '../../room-status/entities/room-status.entity';
+import { CountWordEntity } from '../../count-words/entities/count-word.entity';
 import { CategoryWordEntity } from '../../category-words/entities/category-word.entity';
 import { LanguageEntity } from '../../languages/entities/language.entity';
-import { TeamEntity } from '../../team/entities/team.entity';
-import { RoomWordsEntity } from '../../room-words/entities/room-words.entity';
-import { CountWordEntity } from '../../count-words/entities/count-word.entity';
 
-@Entity()
-export class RoomEntity {
-  @PrimaryGeneratedColumn()
+export class RoomDto {
+  @Column({ type: 'integer' })
   id: number;
 
   @ManyToOne(() => UserEntity, (user) => user.rooms)
   @JoinColumn()
-  id_creator: number;
+  creator: number;
 
   @ManyToOne(() => RoomStatusEntity, (room_status) => room_status.id)
   @JoinColumn()
-  id_status: number;
+  status: RoomStatusEntity;
 
   @ManyToOne(() => CountWordEntity, (count_words) => count_words.id)
   @JoinColumn()
-  id_count_words: number;
+  count_words: CountWordEntity;
 
   @ManyToOne(() => CategoryWordEntity, (category_words) => category_words.id, {
     nullable: true,
   })
   @JoinColumn()
-  id_category_words?: number;
+  category_words?: CategoryWordEntity;
 
   @ManyToOne(() => LanguageEntity, (languages) => languages.id)
   @JoinColumn()
-  id_language_words: number;
+  language_words: LanguageEntity;
 
   @ManyToOne(() => LanguageEntity, (languages) => languages.id, {
     nullable: true,
   })
   @JoinColumn()
-  id_translation_words?: number;
+  translation_words?: LanguageEntity;
 
   @Column({ type: 'integer' })
   time_for_break: number;
@@ -73,10 +60,4 @@ export class RoomEntity {
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
-
-  @OneToMany(() => RoomWordsEntity, (room_word) => room_word.id_room)
-  roomWords: RoomWordsEntity[];
-
-  @OneToMany(() => TeamEntity, (team) => team.id_room)
-  teams: TeamEntity[];
 }
