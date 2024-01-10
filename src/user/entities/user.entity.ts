@@ -3,7 +3,6 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
-  ManyToMany,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -49,7 +48,7 @@ export class UserEntity {
 
   @OneToOne(() => TypeUserEntity, (type_user) => type_user.id)
   @JoinColumn()
-  id_type: TypeUserEntity;
+  idType: TypeUserEntity;
 
   @OneToMany(() => CustomersEntity, (customers) => customers.id_user)
   customers: CustomersEntity[];
