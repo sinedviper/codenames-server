@@ -1,38 +1,24 @@
-import {
-  IsAlphanumeric,
-  IsInt,
-  IsNotEmpty,
-  IsString, IsStrongPassword,
-  Matches,
-  MinLength,
-} from 'class-validator';
+import { IsNotEmpty, Matches, MinLength } from 'class-validator';
 
-const passwordRegEx =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*d)(?=.*[@$!%*?&])[A-Za-zd@$!%*?&]{8,20}$/;
+const passwordRegEx = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,20}$/;
+const loginRegEx = /^[a-zA-Z]{3,20}$/;
 
 export class CreateUserDto {
-  @IsNotEmpty()
-  @MinLength(1, { message: 'Username must have atleast 3 characters.' })
-  /*@IsAlphanumeric(null, {
-    message: 'Username does not allow other than alpha numeric chars.',
-  })*/
+  @IsNotEmpty({ message: 'Username can`t be empty' })
+  @Matches(loginRegEx, {
+    message:
+      'Username must be from 3 to 20 characters and contain only english letters',
+  })
   username: string;
 
-  @IsNotEmpty()
-  /*@Matches(passwordRegEx, {
-    message: `Password must contain Minimum 8 and maximum 20 characters,
-        at least one uppercase letter,
-        one lowercase letter,
-        one number and
-        one special character`,
-  })*/
+  @IsNotEmpty({ message: 'Password can`t be empty' })
+  @Matches(passwordRegEx, {
+    message:
+      'Password must be from 6 to 20 characters and contain one uppercase letter, one lowercase letter and one number',
+  })
   password: string;
 
-  @IsNotEmpty()
-  @MinLength(7, { message: 'Color must have atleast 7 characters.' })
+  @IsNotEmpty({ message: 'Color can`t be empty' })
+  @MinLength(7, { message: 'Color must have at least 7 characters' })
   color: string;
-
-  age?: number;
-  avatar?: string;
-  status?: string;
 }
