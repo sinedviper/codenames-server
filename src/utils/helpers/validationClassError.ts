@@ -16,10 +16,14 @@ export class ValidationFilter implements ExceptionFilter {
 
       if (Array.isArray(validationErrors) && validationErrors.length !== 0) {
         const message = validationErrors.join('. ');
-
         return response.status(400).json({
           statusCode: 400,
           message,
+        });
+      } else {
+        return response.status(exception.getStatus()).json({
+          statusCode: exception.getStatus(),
+          message: exception.getResponse(),
         });
       }
     }

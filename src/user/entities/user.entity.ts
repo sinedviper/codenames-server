@@ -3,9 +3,9 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToMany,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { RequestFriendEntity } from '../../request-friend/entities/request-friend.entity';
@@ -21,6 +21,10 @@ export class UserEntity {
 
   @Column({ type: 'varchar', length: 30 })
   username: string;
+
+  @ManyToOne(() => TypeUserEntity, (typeUser) => typeUser.id, { eager: true }) // Исправление здесь
+  @JoinColumn({ name: 'id_type' }) // Исправление здесь
+  id_type: TypeUserEntity;
 
   @Column({ type: 'varchar', length: 255 })
   password: string;
@@ -46,22 +50,18 @@ export class UserEntity {
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @OneToOne(() => TypeUserEntity, (type_user) => type_user.id)
-  @JoinColumn()
-  idType: TypeUserEntity;
+  @ManyToMany(() => CustomersEntity, (customers) => customers.id_user)
+  customers: number;
 
-  @OneToMany(() => CustomersEntity, (customers) => customers.id_user)
-  customers: CustomersEntity[];
+  @ManyToMany(() => FriendEntity, (friend) => friend.id_user)
+  friends: number;
 
-  @OneToMany(() => FriendEntity, (friend) => friend.id_user)
-  friends: FriendEntity[];
-
-  @ManyToOne(() => RoomEntity, (room) => room.id_creator)
-  rooms: RoomEntity[];
+  @OneToMany(() => RoomEntity, (room) => room.id_creator)
+  rooms: number;
 
   @OneToMany(
     () => RequestFriendEntity,
     (request_friend) => request_friend.id_user,
   )
-  friendRequests: RequestFriendEntity[];
+  friendRequests: RequestFriendEntity;
 }

@@ -50,7 +50,7 @@ export class UserService {
     });
 
     if (findUserType) {
-      newUser.idType = findUserType;
+      newUser.id_type = findUserType;
     }
 
     return {

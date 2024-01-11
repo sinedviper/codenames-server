@@ -16,6 +16,7 @@ export class AuthService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+
     @InjectRepository(TypeUserEntity)
     private readonly typeUserRepository: Repository<TypeUserEntity>,
   ) {}
@@ -48,9 +49,10 @@ export class AuthService {
     }
 
     const newUser = new UserEntity();
-    newUser.idType = findUserStatus;
+    newUser.id_type = findUserStatus;
 
     Object.assign(newUser, dto);
+
     try {
       newUser.password = await hash(newUser.password, 10);
     } catch (e) {
@@ -75,18 +77,6 @@ export class AuthService {
     const userByUsername = await this.userRepository.findOne({
       where: { username: dto.username },
     });
-    console.log(userByUsername.idType);
-
-    // const typeUser = await this.typeUserRepository.findOne({
-    //   where: { id: userByUsername?.idTypeId },
-    // });
-    //
-    // if (!typeUser) {
-    //   throw new HttpException(
-    //     'Something was wrong',
-    //     HttpStatus.EXPECTATION_FAILED,
-    //   );
-    // }
 
     if (!userByUsername)
       throw new HttpException(Errors.USER_NOT_FOUND, HttpStatus.BAD_REQUEST);

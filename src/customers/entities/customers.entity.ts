@@ -2,6 +2,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -17,7 +18,7 @@ export class CustomersEntity {
   @JoinColumn()
   id_room: RoomEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.customers)
+  @ManyToMany(() => UserEntity, (user) => user.customers)
   @JoinColumn()
   id_user: UserEntity;
 
