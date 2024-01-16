@@ -21,9 +21,16 @@ export class ValidationFilter implements ExceptionFilter {
           message,
         });
       } else {
+        const res = exception.getResponse() as any;
+        if (Object.keys(exception.getResponse()).includes('error')) {
+          return response.status(exception.getStatus()).json({
+            statusCode: exception.getStatus(),
+            message: res?.message,
+          });
+        }
         return response.status(exception.getStatus()).json({
           statusCode: exception.getStatus(),
-          message: exception.getResponse(),
+          message: res,
         });
       }
     }

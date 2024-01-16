@@ -10,6 +10,7 @@ import { Errors } from '../services/errors';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -19,11 +20,13 @@ export class AuthService {
 
     @InjectRepository(TypeUserEntity)
     private readonly typeUserRepository: Repository<TypeUserEntity>,
+
+    private jwtService: JwtService,
   ) {}
 
   async registration(
     dto: CreateUserDto,
-  ): Promise<typeHttpResponse<Omit<UserEntity, 'password'>>> {
+  ): Promise<typeHttpResponse<{ accessToken: string }>> {
     if (!dto.username || !dto.color || !dto.password) {
       throw new HttpException(
         "Update params aren't in body",
@@ -65,15 +68,20 @@ export class AuthService {
     const data = await this.userRepository.save(newUser);
     delete data.password;
 
+    const accessToken = this.jwtService.sign(
+      { sub: data },
+      { secret: process.env.PUBLIC_KEY },
+    );
+
     return {
       statusCode: HttpStatus.CREATED,
-      data,
+      data: { accessToken },
     };
   }
 
   async login(
     dto: LoginDto,
-  ): Promise<typeHttpResponse<Omit<UserEntity, 'password'>>> {
+  ): Promise<typeHttpResponse<{ accessToken: string }>> {
     const userByUsername = await this.userRepository.findOne({
       where: { username: dto.username },
     });
@@ -94,9 +102,14 @@ export class AuthService {
 
     delete userByUsername.password;
 
+    const accessToken = this.jwtService.sign(
+      { sub: userByUsername },
+      { secret: process.env.PUBLIC_KEY },
+    );
+
     return {
       statusCode: HttpStatus.OK,
-      data: userByUsername,
+      data: { accessToken },
     };
   }
 }

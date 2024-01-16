@@ -37,7 +37,9 @@ import { TypeWordsEntity } from './type-words/entities/type-words.entity';
 import { FriendEntity } from './friend/entities/friend.entity';
 import { RequestFriendEntity } from './request-friend/entities/request-friend.entity';
 import { ValidationFilter } from './utils/helpers';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { ConfigModule } from '@nestjs/config';
+import { AuthGuard } from './auth/auth.guard';
 
 @Module({
   imports: [
@@ -86,6 +88,7 @@ import { APP_FILTER } from '@nestjs/core';
     TypeWordsModule,
     CategoryWordsModule,
     AuthModule,
+    ConfigModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [

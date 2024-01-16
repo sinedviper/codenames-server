@@ -6,15 +6,19 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { CategoryWordsService } from './category-words.service';
 import { CreateCategoryWordDto } from './dto/create-category-word.dto';
 import { UpdateCategoryWordDto } from './dto/update-category-word.dto';
+import { AuthGuard } from '../auth/auth.guard';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('category-words')
 export class CategoryWordsController {
   constructor(private readonly categoryWordsService: CategoryWordsService) {}
 
+  @UseGuards(new AuthGuard(new JwtService(), ['admin']))
   @Post()
   createCategoryWords(@Body() createCategoryWordDto: CreateCategoryWordDto) {
     return this.categoryWordsService.create(createCategoryWordDto);
