@@ -1,6 +1,6 @@
 import { IsNotEmpty, MinLength } from 'class-validator';
 
-export class CreateCRMUserDto {
+export class CreateUserDto {
   @IsNotEmpty()
   @MinLength(1, { message: 'Username must have at least 3 characters.' })
   username: string;

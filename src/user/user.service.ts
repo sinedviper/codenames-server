@@ -1,22 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { hash } from 'bcrypt';
 import { typeHttpResponse } from '../types';
-import {
-  buildUserResponse,
-  checkExistsUsername,
-  hashPassword,
-} from '../services/user';
-import { UserResponseInterface } from '../interfaces/user/userResponce.interface';
-import { Errors } from '../services/errors';
-import { CreateCRMUserDto } from './dto/createCRM-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { TypeUserEntity } from '../type-user/entities/type-user.entity';
-import * as path from 'path';
-import { v4 } from 'uuid';
-import * as fs from 'fs';
+import { CategoryWordEntity } from '../category-words/entities/category-word.entity';
+import { UpdateCategoryWordDto } from '../category-words/dto/update-category-word.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -27,124 +19,176 @@ export class UserService {
     private readonly typeUserRepository: Repository<TypeUserEntity>,
   ) {}
 
-  private readonly uploadDir = path.join(__dirname, 'uploads');
+  // private readonly uploadDir = path.join(__dirname, 'uploads');
 
-  async createUserForCRM(
-    dto: CreateCRMUserDto,
-  ): Promise<typeHttpResponse<UserResponseInterface>> {
-    if (await checkExistsUsername(this.userRepository, dto.username)) {
+  async create(
+    createUserDto: CreateUserDto,
+  ): Promise<typeHttpResponse<UserEntity>> {
+    if (
+      !createUserDto.username &&
+      !createUserDto.type &&
+      !createUserDto.password
+    ) {
+      throw new HttpException("Body isn't valid", HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    const findUser = await this.userRepository.findOne({
+      where: { username: createUserDto.username },
+    });
+
+    if (findUser) {
       throw new HttpException(
-        Errors.USERNAME_TAKEN,
-        HttpStatus.UNPROCESSABLE_ENTITY,
+        'A user with that nickname already exists',
+        HttpStatus.CONFLICT,
       );
     }
 
-    const newUser = new UserEntity();
-
-    Object.assign(newUser, dto);
-
-    newUser.password = await hashPassword(newUser.password);
-
-    const findUserType = await this.typeUserRepository.findOneBy({
-      id: dto.type,
+    const findUserStatus = await this.typeUserRepository.findOne({
+      where: { type: 'user' },
     });
-
-    if (findUserType) {
-      newUser.id_type = findUserType;
+    if (!findUserStatus) {
+      throw new HttpException('A user type isn`t found', HttpStatus.CONFLICT);
     }
 
-    return {
-      statusCode: HttpStatus.CREATED,
-      data: buildUserResponse(await this.userRepository.save(newUser)),
-    };
+    const newUser = new UserEntity();
+    newUser.id_type = findUserStatus;
+
+    Object.assign(newUser, createUserDto);
+
+    try {
+      newUser.password = await hash(newUser.password, 10);
+    } catch (e) {
+      throw new HttpException(
+        'Something was wrong',
+        HttpStatus.EXPECTATION_FAILED,
+      );
+    }
+
+    const data = await this.userRepository.save(newUser);
+
+    try {
+      return {
+        statusCode: HttpStatus.CREATED,
+        data,
+      };
+    } catch (e) {
+      throw new HttpException(
+        'Something was wrong',
+        HttpStatus.EXPECTATION_FAILED,
+      );
+    }
   }
 
-  async findAll(): Promise<typeHttpResponse<UserResponseInterface[]>> {
-    const users = await this.userRepository.find();
-
-    return {
-      statusCode: HttpStatus.OK,
-      data: users.map((v) => buildUserResponse(v)),
-    };
+  async findAll(): Promise<typeHttpResponse<UserEntity[]>> {
+    try {
+      return {
+        statusCode: HttpStatus.OK,
+        data: await this.userRepository.find(),
+      };
+    } catch (e) {
+      throw new HttpException(
+        'Something was wrong',
+        HttpStatus.EXPECTATION_FAILED,
+      );
+    }
   }
 
-  async findOne(id: number): Promise<typeHttpResponse<UserResponseInterface>> {
-    const user = await this.userRepository.findOneBy({ id });
+  async findOne(id: number): Promise<typeHttpResponse<UserEntity>> {
+    if (!id) {
+      throw new HttpException("User id isn't in body", HttpStatus.BAD_REQUEST);
+    }
 
-    if (!user)
-      throw new HttpException(Errors.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
-
-    return {
-      statusCode: HttpStatus.OK,
-      data: buildUserResponse(user),
-    };
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new HttpException("User isn't found", HttpStatus.NOT_FOUND);
+    }
+    return { statusCode: HttpStatus.OK, data: user };
   }
 
   async update(
-    id: number,
-    dto: UpdateUserDto,
-  ): Promise<typeHttpResponse<UserResponseInterface>> {
-    const findUser = await this.userRepository.findOneBy({ id });
-
-    if (!findUser)
-      throw new HttpException(Errors.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
-
-    if (dto.password) findUser.password = await hash(dto.password, 10);
-
-    this.userRepository.merge(findUser, dto);
-
-    return {
-      statusCode: HttpStatus.OK,
-      data: buildUserResponse(await this.userRepository.save(findUser)),
-    };
-  }
-
-  async remove(id: number): Promise<typeHttpResponse<boolean>> {
-    const findUser = await this.userRepository.findOneBy({ id });
-
-    if (!findUser)
-      throw new HttpException(Errors.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
-
-    await this.userRepository.remove(findUser);
-
-    return {
-      statusCode: HttpStatus.OK,
-      data: true,
-    };
-  }
-
-  async setAvatar(
-    id: number,
-    file: Express.Multer.File,
-  ): Promise<typeHttpResponse<Boolean>> {
-    const user = await this.userRepository.findOneBy({ id });
-
-    if (!user)
-      throw new HttpException(Errors.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
-
-    if (file.size <= 0)
-      throw new HttpException("Img doesn't exists!", HttpStatus.BAD_REQUEST);
-
-    if (user.avatar) {
-      const fullPath = path.join(__dirname, '..', '..', user.avatar);
-      if (fs.existsSync(fullPath)) {
-        fs.unlinkSync(fullPath);
-      }
+    updateUpdateUserDto: UpdateUserDto,
+  ): Promise<typeHttpResponse<UserEntity>> {
+    if (!updateUpdateUserDto.id) {
+      throw new HttpException(
+        "User params aren't in body",
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
-    const uniqueFileName = v4() + path.extname(file.originalname);
-    const filePath = `./image/${uniqueFileName}`;
+    const userFind = await this.userRepository.findOne({
+      where: { id: updateUpdateUserDto.id },
+    });
 
-    fs.writeFileSync(filePath, file.buffer);
+    if (!userFind) {
+      throw new HttpException("User isn't found", HttpStatus.NOT_FOUND);
+    }
 
-    user.avatar = filePath;
-    await this.userRepository.save(user);
+    userFind.username = updateUpdateUserDto?.username ?? userFind.username;
+    userFind.password = updateUpdateUserDto?.password
+      ? await hash(updateUpdateUserDto.password, 10)
+      : userFind.password;
+    userFind.color = updateUpdateUserDto?.color ?? userFind.color;
 
-    return {
-      statusCode: HttpStatus.OK,
-      data: true,
-    };
+    try {
+      return {
+        statusCode: HttpStatus.OK,
+        data: await this.userRepository.save(userFind),
+      };
+    } catch (e) {
+      throw new HttpException(
+        'Something was wrong',
+        HttpStatus.EXPECTATION_FAILED,
+      );
+    }
   }
 
-  async deleteAvatar() {}
+  async remove(id: number): Promise<typeHttpResponse<null>> {
+    if (!id) {
+      throw new HttpException("User id isn't in body", HttpStatus.BAD_REQUEST);
+    }
+    const categoryWords = await this.userRepository.findOne({ where: { id } });
+    if (!categoryWords) {
+      throw new HttpException("User isn't found", HttpStatus.NOT_FOUND);
+    }
+    try {
+      await this.userRepository.delete(id);
+
+      return { statusCode: HttpStatus.OK };
+    } catch (e) {
+      throw new HttpException(e?.message, HttpStatus.CONFLICT);
+    }
+  }
+
+  // async setAvatar(
+  //   id: number,
+  //   file: Express.Multer.File,
+  // ): Promise<typeHttpResponse<Boolean>> {
+  //   const user = await this.userRepository.findOneBy({ id });
+  //
+  //   if (!user)
+  //     throw new HttpException(Errors.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+  //
+  //   if (file.size <= 0)
+  //     throw new HttpException("Img doesn't exists!", HttpStatus.BAD_REQUEST);
+  //
+  //   if (user.avatar) {
+  //     const fullPath = path.join(__dirname, '..', '..', user.avatar);
+  //     if (fs.existsSync(fullPath)) {
+  //       fs.unlinkSync(fullPath);
+  //     }
+  //   }
+  //
+  //   const uniqueFileName = v4() + path.extname(file.originalname);
+  //   const filePath = `./image/${uniqueFileName}`;
+  //
+  //   fs.writeFileSync(filePath, file.buffer);
+  //
+  //   user.avatar = filePath;
+  //   await this.userRepository.save(user);
+  //
+  //   return {
+  //     statusCode: HttpStatus.OK,
+  //     data: true,
+  //   };
+  // }
 }
