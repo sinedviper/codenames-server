@@ -6,8 +6,6 @@ import { hash } from 'bcrypt';
 import { typeHttpResponse } from '../types';
 import { CreateUserDto } from './dto/create-user.dto';
 import { TypeUserEntity } from '../type-user/entities/type-user.entity';
-import { CategoryWordEntity } from '../category-words/entities/category-word.entity';
-import { UpdateCategoryWordDto } from '../category-words/dto/update-category-word.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
@@ -18,8 +16,6 @@ export class UserService {
     @InjectRepository(TypeUserEntity)
     private readonly typeUserRepository: Repository<TypeUserEntity>,
   ) {}
-
-  // private readonly uploadDir = path.join(__dirname, 'uploads');
 
   async create(
     createUserDto: CreateUserDto,
@@ -128,6 +124,12 @@ export class UserService {
       ? await hash(updateUpdateUserDto.password, 10)
       : userFind.password;
     userFind.color = updateUpdateUserDto?.color ?? userFind.color;
+    userFind.lose = updateUpdateUserDto?.lose ?? userFind.lose;
+    userFind.wins = updateUpdateUserDto?.wins ?? userFind.wins;
+    userFind.id_type = updateUpdateUserDto?.id_type ?? userFind.id_type;
+    userFind.status = updateUpdateUserDto?.status ?? userFind.status;
+    userFind.avatar = updateUpdateUserDto?.avatar ?? userFind.avatar;
+    userFind.scores = updateUpdateUserDto?.scores ?? userFind.scores;
 
     try {
       return {
@@ -158,37 +160,4 @@ export class UserService {
       throw new HttpException(e?.message, HttpStatus.CONFLICT);
     }
   }
-
-  // async setAvatar(
-  //   id: number,
-  //   file: Express.Multer.File,
-  // ): Promise<typeHttpResponse<Boolean>> {
-  //   const user = await this.userRepository.findOneBy({ id });
-  //
-  //   if (!user)
-  //     throw new HttpException(Errors.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
-  //
-  //   if (file.size <= 0)
-  //     throw new HttpException("Img doesn't exists!", HttpStatus.BAD_REQUEST);
-  //
-  //   if (user.avatar) {
-  //     const fullPath = path.join(__dirname, '..', '..', user.avatar);
-  //     if (fs.existsSync(fullPath)) {
-  //       fs.unlinkSync(fullPath);
-  //     }
-  //   }
-  //
-  //   const uniqueFileName = v4() + path.extname(file.originalname);
-  //   const filePath = `./image/${uniqueFileName}`;
-  //
-  //   fs.writeFileSync(filePath, file.buffer);
-  //
-  //   user.avatar = filePath;
-  //   await this.userRepository.save(user);
-  //
-  //   return {
-  //     statusCode: HttpStatus.OK,
-  //     data: true,
-  //   };
-  // }
 }
