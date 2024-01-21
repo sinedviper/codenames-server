@@ -1,13 +1,11 @@
-import { IsNotEmpty, Matches, MinLength } from 'class-validator';
-
-const passwordRegEx = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,20}$/;
-const loginRegEx = /^[a-zA-Z]{3,20}$/;
+import { IsNotEmpty, Matches, MinLength, IsDateString } from 'class-validator';
+import { loginRegEx, passwordRegEx } from '../../utils/constance';
 
 export class CreateUserDto {
   @IsNotEmpty({ message: 'Username can`t be empty' })
   @Matches(loginRegEx, {
     message:
-      'Username must be from 3 to 20 characters and contain only english letters',
+      'Username must be from 3 to 20 characters and contain only english letters and one number',
   })
   username: string;
 
@@ -21,4 +19,8 @@ export class CreateUserDto {
   @IsNotEmpty({ message: 'Color can`t be empty' })
   @MinLength(7, { message: 'Color must have at least 7 characters' })
   color: string;
+
+  @IsNotEmpty({ message: 'Date can`t be empty' })
+  @IsDateString({}, { message: 'Date must be date' })
+  date_recover: Date;
 }

@@ -13,6 +13,7 @@ import { TypeUserEntity } from '../../type-user/entities/type-user.entity';
 import { RoomEntity } from '../../room/entities/room.entity';
 import { FriendEntity } from '../../friend/entities/friend.entity';
 import { CustomersEntity } from '../../customers/entities/customers.entity';
+import { ImagesEntity } from '../../images/entities/images.entity';
 
 @Entity()
 export class UserEntity {
@@ -22,15 +23,24 @@ export class UserEntity {
   @Column({ type: 'varchar', length: 30 })
   username: string;
 
-  @ManyToOne(() => TypeUserEntity, (typeUser) => typeUser.id, { eager: true }) // Исправление здесь
-  @JoinColumn({ name: 'id_type' }) // Исправление здесь
+  @ManyToOne(() => TypeUserEntity, (typeUser) => typeUser.id, { eager: true })
+  @JoinColumn({ name: 'id_type' })
   id_type: TypeUserEntity;
 
   @Column({ type: 'varchar', length: 255 })
   password: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  avatar?: string;
+  @Column({ type: 'date' })
+  date_recover: Date;
+
+  @ManyToOne(() => ImagesEntity, (image) => image.id, {
+    nullable: true,
+    eager: true,
+    orphanedRowAction: 'nullify',
+    cascade: true,
+  })
+  @JoinColumn()
+  avatar?: ImagesEntity;
 
   @Column({ type: 'varchar', length: 7 })
   color: string;

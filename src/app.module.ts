@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { UserEntity } from './user/entities/user.entity';
 import { CustomersModule } from './customers/customers.module';
@@ -37,9 +35,11 @@ import { TypeWordsEntity } from './type-words/entities/type-words.entity';
 import { FriendEntity } from './friend/entities/friend.entity';
 import { RequestFriendEntity } from './request-friend/entities/request-friend.entity';
 import { ValidationFilter } from './utils/helpers';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { APP_FILTER } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
-import { AuthGuard } from './auth/auth.guard';
+import { ImagesModule } from './images/images.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { ImagesEntity } from './images/entities/images.entity';
 
 @Module({
   imports: [
@@ -66,6 +66,7 @@ import { AuthGuard } from './auth/auth.guard';
         TypeWordsEntity,
         FriendEntity,
         RequestFriendEntity,
+        ImagesEntity,
       ],
       database: 'codenames',
       synchronize: true,
@@ -88,11 +89,14 @@ import { AuthGuard } from './auth/auth.guard';
     TypeWordsModule,
     CategoryWordsModule,
     AuthModule,
+    ImagesModule,
     ConfigModule.forRoot(),
+    MulterModule.register({
+      dest: './images',
+    }),
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [
-    AppService,
     {
       provide: APP_FILTER,
       useClass: ValidationFilter,

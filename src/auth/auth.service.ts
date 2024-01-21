@@ -4,8 +4,6 @@ import { Repository } from 'typeorm';
 import { compare, hash } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import * as path from 'path';
-import * as fs from 'fs';
-import { v4 as uuid } from 'uuid';
 
 import { UserEntity } from '../user/entities/user.entity';
 import { typeHttpResponse } from '../types';
@@ -32,7 +30,7 @@ export class AuthService {
   async registration(
     dto: CreateUserDto,
   ): Promise<typeHttpResponse<{ accessToken: string }>> {
-    if (!dto.username || !dto.color || !dto.password) {
+    if (!dto.username || !dto.color || !dto.password || !dto.date_recover) {
       throw new HttpException(
         "Update params aren't in body",
         HttpStatus.BAD_REQUEST,
@@ -44,7 +42,7 @@ export class AuthService {
     });
     if (findUser) {
       throw new HttpException(
-        'A user with that nickname already exists',
+        'There is a user with this username',
         HttpStatus.CONFLICT,
       );
     }
@@ -115,7 +113,9 @@ export class AuthService {
     };
   }
 
-  async update(dto: UpdateUserDto): Promise<typeHttpResponse<any>> {
+  async update(
+    dto: UpdateUserDto,
+  ): Promise<typeHttpResponse<{ accessToken: string }>> {
     if (!dto.id) {
       throw new HttpException(
         "Id params aren't in body",
@@ -130,18 +130,73 @@ export class AuthService {
       throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
     }
 
-    userByUsername.password = dto?.password
-      ? await hash(dto.password, 10)
-      : userByUsername.password;
     userByUsername.color = dto?.color ?? userByUsername.color;
     userByUsername.status = dto?.status ?? userByUsername.status;
 
+    if (dto?.username) {
+      const userUsername = await this.userRepository.findOne({
+        where: { username: dto?.username },
+      });
+      if (userUsername) {
+        throw new HttpException(
+          'There is a user with this username',
+          HttpStatus.BAD_REQUEST,
+        );
+      } else {
+        userByUsername.username = dto?.username;
+      }
+    }
+
+    if (dto.password) {
+      if (!dto.old_password) {
+        throw new HttpException(
+          'Old password not found',
+          HttpStatus.BAD_REQUEST,
+        );
+      } else {
+        const isPasswordCorrect = await compare(
+          dto.old_password,
+          userByUsername.password,
+        );
+        if (isPasswordCorrect) {
+          userByUsername.password = dto.password;
+        } else {
+          throw new HttpException('Password incorrect', HttpStatus.BAD_REQUEST);
+        }
+      }
+    }
+
+    if (dto.date_recover) {
+      if (!dto.password) {
+        throw new HttpException(
+          "Password param aren't in body",
+          HttpStatus.BAD_REQUEST,
+        );
+      } else {
+        const isPasswordCorrect = await compare(
+          dto.password,
+          userByUsername.password,
+        );
+        if (isPasswordCorrect) {
+          userByUsername.date_recover = dto.date_recover;
+        } else {
+          throw new HttpException('Password incorrect', HttpStatus.BAD_REQUEST);
+        }
+      }
+    }
+
     try {
       const data = await this.userRepository.save(userByUsername);
+      delete data.password;
+
+      const accessToken = this.jwtService.sign(
+        { sub: userByUsername },
+        { secret: process.env.PUBLIC_KEY },
+      );
 
       return {
         statusCode: HttpStatus.OK,
-        data,
+        data: { accessToken },
       };
     } catch (e) {
       throw new HttpException(
@@ -149,46 +204,5 @@ export class AuthService {
         HttpStatus.EXPECTATION_FAILED,
       );
     }
-  }
-
-  async updateAvatar(
-    id: number,
-    file: Express.Multer.File,
-  ): Promise<typeHttpResponse<{ accessToken: string }>> {
-    const user = await this.userRepository.findOneBy({ id });
-
-    if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-    }
-
-    if (file.size <= 0)
-      throw new HttpException("Img doesn't exists!", HttpStatus.BAD_REQUEST);
-
-    if (user.avatar) {
-      const fullPath = path.join(__dirname, '..', '..', user.avatar);
-      if (fs.existsSync(fullPath)) {
-        fs.unlinkSync(fullPath);
-      }
-    }
-
-    const uniqueFileName = uuid() + path.extname(file.originalname);
-    const filePath = `./image/${uniqueFileName}`;
-
-    fs.writeFileSync(filePath, file.buffer);
-
-    user.avatar = filePath;
-    await this.userRepository.save(user);
-
-    delete user.password;
-
-    const accessToken = this.jwtService.sign(
-      { sub: user },
-      { secret: process.env.PUBLIC_KEY },
-    );
-
-    return {
-      statusCode: HttpStatus.OK,
-      data: { accessToken },
-    };
   }
 }

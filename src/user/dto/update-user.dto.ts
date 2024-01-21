@@ -27,4 +27,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @IsNotEmpty()
   lose?: number;
+
+  @IsNotEmpty()
+  date_recover?: Date;
 }

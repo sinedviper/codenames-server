@@ -128,7 +128,6 @@ export class UserService {
     userFind.wins = updateUpdateUserDto?.wins ?? userFind.wins;
     userFind.id_type = updateUpdateUserDto?.id_type ?? userFind.id_type;
     userFind.status = updateUpdateUserDto?.status ?? userFind.status;
-    userFind.avatar = updateUpdateUserDto?.avatar ?? userFind.avatar;
     userFind.scores = updateUpdateUserDto?.scores ?? userFind.scores;
 
     try {
