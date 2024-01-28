@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { ImagesEntity } from './entities/images.entity';
 import * as fs from 'fs';
 import { v4 as uuid } from 'uuid';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class ImagesService {
@@ -16,12 +17,14 @@ export class ImagesService {
 
     @InjectRepository(ImagesEntity)
     private readonly imagesRepository: Repository<ImagesEntity>,
+
+    private jwtService: JwtService,
   ) {}
 
   async update(
     id: number,
     file: Express.Multer.File,
-  ): Promise<typeHttpResponse<UserEntity>> {
+  ): Promise<typeHttpResponse<{ accessToken: string }>> {
     const user = await this.userRepository.findOneBy({ id });
 
     if (!user) {
@@ -59,9 +62,50 @@ export class ImagesService {
     await this.userRepository.save(user);
     delete user.password;
 
+    const accessToken = this.jwtService.sign(
+      { sub: user },
+      { secret: process.env.PUBLIC_KEY },
+    );
+
     return {
       statusCode: HttpStatus.OK,
-      data: user,
+      data: { accessToken },
+    };
+  }
+
+  async delete(id: number): Promise<typeHttpResponse<{ accessToken: string }>> {
+    const user = await this.userRepository.findOneBy({ id });
+
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    if (!user.avatar) {
+      throw new HttpException('Avatar not found', HttpStatus.NOT_FOUND);
+    }
+
+    const fullPath = path.join(__dirname, `../../images/${user.avatar.path}`);
+
+    if (fs.existsSync(fullPath)) {
+      fs.unlinkSync(fullPath);
+    }
+    const idImage = user.avatar.id;
+
+    user.avatar = null;
+
+    await this.userRepository.save(user);
+    await this.imagesRepository.delete(idImage);
+
+    delete user.password;
+
+    const accessToken = this.jwtService.sign(
+      { sub: user },
+      { secret: process.env.PUBLIC_KEY },
+    );
+
+    return {
+      statusCode: HttpStatus.OK,
+      data: { accessToken },
     };
   }
 }

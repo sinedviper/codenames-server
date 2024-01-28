@@ -33,37 +33,21 @@ export class AuthGuard implements CanActivate {
       if (this.userType.includes('admin')) {
         if (user.id_type.id === 1) {
           return true;
-        } else {
-          throw new HttpException(
-            "You aren't an admin",
-            HttpStatus.NOT_ACCEPTABLE,
-          );
         }
       }
       if (this.userType.includes('user')) {
         if (user.id_type.id === 6) {
           return true;
-        } else {
-          throw new HttpException(
-            "You aren't an user",
-            HttpStatus.NOT_ACCEPTABLE,
-          );
         }
       }
-
       if (this.userType.includes('editor')) {
         if (user.id_type.id === 4) {
           return true;
-        } else {
-          throw new HttpException(
-            "You aren't an editor",
-            HttpStatus.NOT_ACCEPTABLE,
-          );
         }
       }
 
       throw new HttpException(
-        "You haven't acces for this request",
+        "You haven't access for this request",
         HttpStatus.NOT_ACCEPTABLE,
       );
     } catch (error) {

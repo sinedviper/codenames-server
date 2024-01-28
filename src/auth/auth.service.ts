@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { compare, hash } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import * as path from 'path';
 
 import { UserEntity } from '../user/entities/user.entity';
 import { typeHttpResponse } from '../types';
@@ -24,8 +23,6 @@ export class AuthService {
 
     private jwtService: JwtService,
   ) {}
-
-  private readonly uploadDir = path.join(__dirname, 'uploads');
 
   async registration(
     dto: CreateUserDto,
