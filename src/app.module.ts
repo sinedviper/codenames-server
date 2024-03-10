@@ -40,6 +40,8 @@ import { ConfigModule } from '@nestjs/config';
 import { ImagesModule } from './images/images.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { ImagesEntity } from './images/entities/images.entity';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import * as path from 'path';
 
 @Module({
   imports: [
@@ -47,7 +49,7 @@ import { ImagesEntity } from './images/entities/images.entity';
       type: 'postgres',
       host: 'localhost',
       port: 5432,
-      password: '668077Den',
+      password: 'root',
       username: 'postgres',
       entities: [
         UserEntity,
@@ -93,6 +95,10 @@ import { ImagesEntity } from './images/entities/images.entity';
     ConfigModule.forRoot(),
     MulterModule.register({
       dest: './images',
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: path.join(__dirname, '../images'), // Укажите путь к папке с изображениями
+      serveRoot: '/images', // Укажите ссылку для доступа к папке
     }),
   ],
   controllers: [],

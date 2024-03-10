@@ -22,19 +22,19 @@ export class UpdateUserDto {
   })
   username?: string;
 
-  @ValidateIf((o) => o.old_password && o.password)
+  @ValidateIf((o) => o.new_password && o.password)
   @Matches(passwordRegEx, {
     message:
       'Password must be from 6 to 20 characters and contain one uppercase letter, one lowercase letter and one number',
   })
   password?: string;
 
-  @ValidateIf((o) => o.old_password && o.password)
+  @ValidateIf((o) => o.new_password && o.password)
   @Matches(passwordRegEx, {
     message:
       'Old password must be from 6 to 20 characters and contain one uppercase letter, one lowercase letter and one number',
   })
-  old_password?: string;
+  new_password?: string;
 
   @ValidateIf((o) => o.color)
   @MinLength(7, {

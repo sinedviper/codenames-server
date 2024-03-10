@@ -34,7 +34,7 @@ export class ImagesService {
     if (file.size <= 0 || file.size > 10 * 1024 * 1024)
       throw new HttpException("Image doesn't exists", HttpStatus.BAD_REQUEST);
 
-    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
       throw new HttpException(
         'Only image files are allowed',
         HttpStatus.BAD_REQUEST,
@@ -50,6 +50,15 @@ export class ImagesService {
       user.avatar = null;
       await this.userRepository.save(user);
       await this.imagesRepository.delete(idImage);
+    } else {
+      const folderName = './images';
+      fs.stat(folderName, (err) => {
+        if (err) {
+          if (err.code === 'ENOENT') {
+            fs.mkdirSync(folderName, { recursive: true });
+          }
+        }
+      });
     }
 
     const uniqueFileName = uuid() + path.extname(file.originalname);

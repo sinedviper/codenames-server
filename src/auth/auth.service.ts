@@ -134,7 +134,7 @@ export class AuthService {
       const userUsername = await this.userRepository.findOne({
         where: { username: dto?.username },
       });
-      if (userUsername) {
+      if (userUsername && dto.id !== userUsername.id) {
         throw new HttpException(
           'There is a user with this username',
           HttpStatus.BAD_REQUEST,
@@ -144,19 +144,16 @@ export class AuthService {
       }
     }
 
-    if (dto.password) {
-      if (!dto.old_password) {
-        throw new HttpException(
-          'Old password not found',
-          HttpStatus.BAD_REQUEST,
-        );
+    if (dto.new_password) {
+      if (!dto.password) {
+        throw new HttpException('Password not found', HttpStatus.BAD_REQUEST);
       } else {
         const isPasswordCorrect = await compare(
-          dto.old_password,
+          dto.password,
           userByUsername.password,
         );
         if (isPasswordCorrect) {
-          userByUsername.password = dto.password;
+          userByUsername.password = dto.new_password;
         } else {
           throw new HttpException('Password incorrect', HttpStatus.BAD_REQUEST);
         }

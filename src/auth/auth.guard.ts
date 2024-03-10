@@ -9,6 +9,9 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from '../user/entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TypeUserEntity } from '../type-user/entities/type-user.entity';
+import { Repository } from 'typeorm';
 
 type typesUser = 'user' | 'admin' | 'editor';
 
@@ -36,12 +39,12 @@ export class AuthGuard implements CanActivate {
         }
       }
       if (this.userType.includes('user')) {
-        if (user.id_type.id === 6) {
+        if (user.id_type.id === 0) {
           return true;
         }
       }
       if (this.userType.includes('editor')) {
-        if (user.id_type.id === 4) {
+        if (user.id_type.id === 2) {
           return true;
         }
       }
