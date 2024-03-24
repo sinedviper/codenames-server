@@ -15,6 +15,7 @@ import { RoomStatusEntity } from '../room-status/entities/room-status.entity';
 import { RoomDto } from './dto/room.dto';
 import { TeamDto } from '../team/dto/team.dto';
 import { CreateTeamDto } from '../team/dto/create-team.dto';
+import { typeHttpResponse } from '../types';
 
 @Injectable()
 export class RoomService {
@@ -36,6 +37,32 @@ export class RoomService {
     @InjectRepository(ColorTeamEntity)
     private readonly colorTeam: Repository<ColorTeamEntity>,
   ) {}
+
+  async getCreateParams(): Promise<
+    typeHttpResponse<{
+      languages: LanguageEntity[];
+      countWords: CountWordEntity[];
+    }>
+  > {
+    const languages = await this.language.find();
+    if (languages.length === 0) {
+      throw new HttpException("Sorry, haven't languages", HttpStatus.NOT_FOUND);
+    }
+
+    const countWords = await this.countWord.find();
+
+    if (countWords.length === 0) {
+      throw new HttpException(
+        "Sorry, haven't count words",
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return {
+      statusCode: HttpStatus.CREATED,
+      data: { languages, countWords },
+    };
+  }
 
   async create(createRoomDto: CreateRoomDto) {
     const room = new RoomEntity();
@@ -288,7 +315,7 @@ export class RoomService {
     }
   }
 
-  async findAll() {
+  async findAll(): Promise<typeHttpResponse<RoomEntity[]>> {
     try {
       return {
         statusCode: HttpStatus.OK,
@@ -302,7 +329,7 @@ export class RoomService {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<typeHttpResponse<RoomEntity>> {
     if (!id) {
       throw new HttpException("Room id isn't in body", HttpStatus.BAD_REQUEST);
     }
@@ -317,7 +344,7 @@ export class RoomService {
     return `This action updates a room`;
   }
 
-  async remove(id: number) {
+  async remove(id: number): Promise<typeHttpResponse<null>> {
     if (!id) {
       throw new HttpException("Room id isn't in body", HttpStatus.BAD_REQUEST);
     }

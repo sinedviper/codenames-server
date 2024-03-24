@@ -38,7 +38,7 @@ export class CreateRoomDto {
   translation_card: boolean;
 
   @Column({ type: 'varchar', length: 6, nullable: true })
-  password: string;
+  password?: string;
 
   @Column({ type: 'boolean' })
   close_room: boolean;

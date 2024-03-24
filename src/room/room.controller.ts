@@ -24,6 +24,12 @@ export class RoomController {
     return this.roomService.create(createRoomDto);
   }
 
+  @UseGuards(new AuthGuard(new JwtService(), ['user']))
+  @Get('create-params')
+  getCreateParams() {
+    return this.roomService.getCreateParams();
+  }
+
   @UseGuards(new AuthGuard(new JwtService(), ['admin', 'user', 'editor']))
   @Get()
   findAll() {
